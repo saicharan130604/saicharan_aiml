@@ -1,46 +1,82 @@
-# AP21110010910
-
-from collections import deque
-
-GOAL_STATE = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
-
-MOVES = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-
-def is_valid(x, y):
-    return 0 <= x < 3 and 0 <= y < 3
-
-def swap(board, x1, y1, x2, y2):
-    board[x1][y1], board[x2][y2] = board[x2][y2], board[x1][y1]
-
-def Create(initial_state, level):
-    visited = set()
-    queue = deque([(initial_state, 0)])
-
-    while queue:
-        current_state, current_level = queue.popleft()
-
-        if current_level > level:
-            break
-
-        print(f"Level {current_level}:")
-        for row in current_state:
-            print(row)
-
-        for x in range(3):
-            for y in range(3):
-                if current_state[x][y] == 0:
-                    for dx, dy in MOVES:
-                        new_x, new_y = x + dx, y + dy
-                        if is_valid(new_x, new_y):
-                            new_state = [list(row) for row in current_state]
-                            swap(new_state, x, y, new_x, new_y)
-                            new_state_tuple = tuple(tuple(row) for row in new_state)
-
-                            if new_state_tuple not in visited:
-                                visited.add(new_state_tuple)
-                                queue.append((new_state, current_level + 1))
-
-if __name__ == "__main__":
-    initial_state = [[1, 2, 3], [0, 4, 6], [7, 5, 8]]
-    level = 3
-    Create(initial_state, level)
+import numpy as np  
+print("Enter the matrix that actions are to be performed: ",end="\n")
+matrix = [[int(input()) for c in range (3)] for r in range(3)]
+print("Enter the matrix the final matrix: ",end="\n")
+matrix2= [[int(input()) for c in range (3)] for r in range(3)]
+def create(matrix,c,d,r,p):
+    def huristic(matrix,c,d):
+        count=0
+        for i in range(3):
+            for j in range(3):
+                if(matrix[i][j]!=matrix2[i][j]):
+                    count+=1
+        print("huristic value :",count,end=" \n")            
+    def find():
+        for i in range(3):
+            for j in range(3):
+                if(matrix[i][j]==0):
+                    c=i
+                    d=j
+        return c,d
+    def left(matrix,c,d):
+            if d > 0:
+                print("depth level",r)
+                print("Action performed: ","left")
+                matrix1=np.copy(matrix)
+                temp1=matrix1[c][d-1]
+                matrix1[c][d-1]=matrix1[c][d]
+                matrix1[c][d]=temp1
+                c,d=find()
+                print(matrix1,end="\n")
+                huristic(matrix1,c,d)
+                create(matrix1,c,d,r+1,p)
+    def right(matrix,c,d):
+            if d < 2 :  
+                print("depth level",r)
+                print("Action performed: ","right")
+                matrix1=np.copy(matrix)  
+                temp1=matrix1[c][d+1]
+                matrix1[c][d+1]=matrix1[c][d]
+                matrix1[c][d]=temp1
+                c,d=find()
+                print(matrix1,end="\n")
+                huristic(matrix1,c,d)
+                create(matrix1,c,d,r+1,p)
+    def up(matrix,c,d):
+            if c > 0:
+                print("depth level",r)
+                print("Action performed: ",'up')
+                matrix1=np.copy(matrix)
+                temp1=matrix[c-1][d]
+                matrix1[c-1][d]=matrix[c][d]
+                matrix1[c][d]=temp1
+                c,d=find()
+                print(matrix1,end="\n")
+                huristic(matrix1,c,d)
+                create(matrix1,c,d,r+1,p)
+    def down(matrix,c,d):
+            if c < 2:  
+                print("depth level",r)
+                print("Action performed: ",'down')
+                matrix1=np.copy(matrix)  
+                temp1=matrix1[c+1][d]
+                matrix1[c+1][d]=matrix1[c][d]
+                matrix1[c][d]=temp1
+                c,d=find()
+                print(matrix1,end="\n")
+                huristic(matrix1,c,d)
+                create(matrix1,c,d,r+1,p)
+    if r>p:
+        return 0
+    c,d=find()
+    left(matrix,c,d)
+    right(matrix,c,d)
+    up(matrix,c,d)
+    down(matrix,c,d)
+print(matrix,end="\n")    
+c=0
+d=0
+r=0
+print("Enter the maximum depth for the tree: ",end="\n")
+p=int(input())
+create(np.array(matrix),c,d,r+1,p)
